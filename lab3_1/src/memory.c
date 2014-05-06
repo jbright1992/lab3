@@ -171,7 +171,7 @@ MemoryTranslateUserToSystem (PCB *pcb, uint32 addr)
 
     int	page = addr / MEMORY_PAGE_SIZE;
     int offset = addr % MEMORY_PAGE_SIZE;
-    if (page > pcb->npages) {
+    if (page > L1_MAX_ENTRIES) {
       return (0);
     }
     return ((pcb->pagetable[page] & MEMORY_PTE_MASK) + offset);

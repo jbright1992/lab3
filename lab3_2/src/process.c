@@ -354,6 +354,7 @@ ProcessFork (VoidFunc func, uint32 param, char *name, int isUser)
   unsigned char buf[100];
   uint32 dum[MAX_ARGS+8], count, offset;
   char *str;
+  
 
   intrs = DisableIntrs ();
   dbprintf ('I', "Old interrupt value was 0x%x.\n", intrs);

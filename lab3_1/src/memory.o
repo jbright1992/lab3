@@ -549,29 +549,29 @@ _MemoryModuleInit:
 	sgei	r1,r2,#0
 	bnez	r1,L68
 	nop	; not filled.
-	addui	r2,r2,#65535
+	addi	r2,r2,#4095
 L68:
-	srai	r8,r2,#0x10
-	lhi	r3,((_pagestart)>>16)&0xffff
-	addui	r3,r3,(_pagestart)&0xffff
+	srai	r7,r2,#0xc
+	lhi	r4,((_pagestart)>>16)&0xffff
+	addui	r4,r4,(_pagestart)&0xffff
 	lhi	r1,((_lastosaddress)>>16)&0xffff
 	addui	r1,r1,(_lastosaddress)&0xffff
-	lw	r1,(r1)
-	addui	r2,r1,#65532
+	lw	r3,(r1)
+	addi	r2,r3,#4092
 	sgei	r1,r2,#0
 	bnez	r1,L69
 	nop	; not filled.
-	addui	r2,r2,#65535
+	addi	r2,r3,#8187
 L69:
-	srai	r1,r2,#0x10
-	sw	(r3),r1
+	srai	r1,r2,#0xc
+	sw	(r4),r1
 	lhi	r3,((_freemapmax)>>16)&0xffff
 	addui	r3,r3,(_freemapmax)&0xffff
-	addi	r2,r8,#31
+	addi	r2,r7,#31
 	sgei	r1,r2,#0
 	bnez	r1,L70
 	nop	; not filled.
-	addi	r2,r8,#62
+	addi	r2,r7,#62
 L70:
 	srai	r1,r2,#0x5
 	sw	(r3),r1
@@ -604,7 +604,7 @@ L72:
 	sw	(r29),r11
 	lw	r1,(r3)
 	sw	4(r29),r1
-	sw	8(r29),r8
+	sw	8(r29),r7
 	jal	_printf
 	nop	; not filled.
 	addi	r29,r29,#16
@@ -670,17 +670,17 @@ L76:
 	lhi	r1,((_pagestart)>>16)&0xffff
 	addui	r1,r1,(_pagestart)&0xffff
 	lw	r4,(r1)
-	slt	r1,r4,r8
+	slt	r1,r4,r7
 	beqz	r1,L81
 	nop	; not filled.
-	add	r7,r0,r2
+	add	r8,r0,r2
 	addi	r10,r0,#1
 	lhi	r9,((_negativeone)>>16)&0xffff
 	addui	r9,r9,(_negativeone)&0xffff
 L83:
-	lw	r1,(r7)
+	lw	r1,(r8)
 	addi	r1,r1,#1
-	sw	(r7),r1
+	sw	(r8),r1
 	add	r2,r0,r4
 	sgei	r1,r4,#0
 	bnez	r1,L85
@@ -738,7 +738,7 @@ L89:
 	addi	r29,r29,#16
 L82:
 	addi	r4,r4,#1
-	slt	r1,r4,r8
+	slt	r1,r4,r7
 	bnez	r1,L83
 	nop	; not filled.
 L81:
@@ -1147,10 +1147,9 @@ _MemoryTranslateUserToSystem:
 	sw	8(r29),r4
 	lw	r3,(r30)
 	lw	r1,4(r30)
-	srli	r31,r1,#0x10
-	andi	r2,r1,#0xffff
-	lw	r1,100(r3)
-	sgt	r1,r31,r1
+	srli	r31,r1,#0xc
+	andi	r2,r1,#4095
+	sgti	r1,r31,#64
 	bnez	r1,L139
 	nop	; not filled.
 	slli	r1,r31,#0x2
@@ -1190,7 +1189,7 @@ _MemoryCopySystemToUser:
 	sw	20(r29),r7
 	sw	24(r29),r8
 	sw	28(r29),r9
-	lw	r7,(r30)
+	lw	r8,(r30)
 	lw	r5,4(r30)
 	lw	r4,8(r30)
 	lw	r3,12(r30)
@@ -1198,13 +1197,11 @@ _MemoryCopySystemToUser:
 	sgti	r1,r3,#0
 	beqz	r1,L167
 	nop	; not filled.
-	lhi	r8,#1
-	addui	r8,r8,#0
+	addi	r7,r0,#4096
 L168:
-	srli	r2,r4,#0x10
-	andi	r31,r4,#0xffff
-	lw	r1,100(r7)
-	sgt	r1,r2,r1
+	srli	r2,r4,#0xc
+	andi	r31,r4,#4095
+	sgti	r1,r2,#64
 	beqz	r1,L170
 	nop	; not filled.
 	addi	r31,r0,#0
@@ -1212,7 +1209,7 @@ L168:
 	nop	; not filled.
 L170:
 	slli	r1,r2,#0x2
-	add	r1,r1,r7
+	add	r1,r1,r8
 	lw	r1,96(r1)
 	addi	r9,r0,#-8
 	and	r1,r1,r9
@@ -1221,8 +1218,8 @@ L169:
 	snei	r1,r31,#0
 	beqz	r1,L167
 	nop	; not filled.
-	andi	r1,r31,#65535
-	sub	r2,r8,r1
+	andi	r1,r31,#4095
+	sub	r2,r7,r1
 	sgt	r1,r2,r3
 	beqz	r1,L172
 	nop	; not filled.
@@ -1275,7 +1272,7 @@ _MemoryCopyUserToSystem:
 	sw	20(r29),r7
 	sw	24(r29),r8
 	sw	28(r29),r9
-	lw	r7,(r30)
+	lw	r8,(r30)
 	lw	r5,8(r30)
 	lw	r4,4(r30)
 	lw	r3,12(r30)
@@ -1283,13 +1280,11 @@ _MemoryCopyUserToSystem:
 	sgti	r1,r3,#0
 	beqz	r1,L191
 	nop	; not filled.
-	lhi	r8,#1
-	addui	r8,r8,#0
+	addi	r7,r0,#4096
 L192:
-	srli	r2,r4,#0x10
-	andi	r31,r4,#0xffff
-	lw	r1,100(r7)
-	sgt	r1,r2,r1
+	srli	r2,r4,#0xc
+	andi	r31,r4,#4095
+	sgti	r1,r2,#64
 	beqz	r1,L194
 	nop	; not filled.
 	addi	r31,r0,#0
@@ -1297,7 +1292,7 @@ L192:
 	nop	; not filled.
 L194:
 	slli	r1,r2,#0x2
-	add	r1,r1,r7
+	add	r1,r1,r8
 	lw	r1,96(r1)
 	addi	r9,r0,#-8
 	and	r1,r1,r9
@@ -1306,8 +1301,8 @@ L193:
 	snei	r1,r31,#0
 	beqz	r1,L191
 	nop	; not filled.
-	andi	r1,r31,#65535
-	sub	r2,r8,r1
+	andi	r1,r31,#4095
+	sub	r2,r7,r1
 	sgt	r1,r2,r3
 	beqz	r1,L197
 	nop	; not filled.
@@ -1353,7 +1348,7 @@ _MemorySetupPte:
 	sw	-8(r29),r31	; push ret addr
 	subui	r29,r29,#8	; alloc local storage
 	lw	r1,(r30)
-	slli	r1,r1,#0x10
+	slli	r1,r1,#0xc
 	ori	r1,r1,#1
 	lw	r31,-8(r30)
 	add	r29,r0,r30
@@ -1370,8 +1365,9 @@ _MemoryFreePte:
 	add	r30,r0,r29	; fp = sp
 	sw	-8(r29),r31	; push ret addr
 	subui	r29,r29,#8	; alloc local storage
+	lw	r1,(r30)
 	addi	r29,r29,#-8
-	lhu	r1,(r30)
+	srli	r1,r1,#0xc
 	sw	(r29),r1
 	jal	_MemoryFreePage
 	nop	; not filled.
