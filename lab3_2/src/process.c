@@ -114,9 +114,9 @@ ProcessFreeResources (PCB *pcb)
 // You may change the code below
 //------------------------------------------
 
-  npages = pcb->npages;
+  pcb->npages = 0;
 
-  for (i = 0; i < pcb->npages; i++) {
+  for (i = 0; i < L1_MAX_ENTRIES; i++) {
     MemoryFreePte (pcb->pagetable[i]);
   }
   // Free the page allocated for the system stack
@@ -354,6 +354,7 @@ ProcessFork (VoidFunc func, uint32 param, char *name, int isUser)
   unsigned char buf[100];
   uint32 dum[MAX_ARGS+8], count, offset;
   char *str;
+
   
 
   intrs = DisableIntrs ();
@@ -395,18 +396,59 @@ ProcessFork (VoidFunc func, uint32 param, char *name, int isUser)
 //------------------------------------------------------------
 
 
-  pcb->npages = 1;
+  pcb->npages = 4;
+
+  //Make every entry zero
+  for (i = 0; i < L1_MAX_ENTRIES; i++){
+    pcb->pagetable[i] = 0x0;
+  }
+
+  // Create the first page table
   newPage = MemoryAllocPage ();
   if (newPage == 0) {
     printf ("aFATAL: couldn't allocate memory - no free pages!\n");
     exitsim ();	// NEVER RETURNS!
   }
   pcb->pagetable[0] = MemorySetupPte (newPage);
+  
+  // Zero out the page table
+  for (i = 0; i < L2_MAX_ENTRIES; i++){
+    *((pcb->pagetable[0] & MEMORY_PTE_MASK) + i) = 0x0
+  }
+
+  // Allocate the first 3 pages for first L2 table
+  for (i = 0; i < 3; i++){
+    newPage = MemoryAllocPage ();
+    if (newPage == 0) {
+      printf ("aFATAL: couldn't allocate memory - no free pages!\n");
+      exitsim ();
+    }
+
+    *((pcb->pagetable[0] & MEMORY_PTE_MASK) + i) = MemorySetupPte (newPage);
+  }
+
+  // Create the second L2 table at the end of L1
   newPage = MemoryAllocPage ();
   if (newPage == 0) {
     printf ("bFATAL: couldn't allocate system stack - no free pages!\n");
     exitsim ();	// NEVER RETURNS!
   }
+
+  pcb->pagetable[L1_MAX_ENTRIES-1] = MemorySetupPte (newPage);
+  
+  //Zero out the page table
+  for (i = 0; i < L2_MAX_ENTRIES; i++){
+    *((pcb->pagetable[L1_MAX_ENTRIES-1] & MEMORY_PTE_MASK) + i) = 0x0;
+  }
+
+  //Add the page to the 2nd table
+  newPage = MemoryAllocPage ();
+  if (newPage == 0) {
+    printf ("bFATAL: couldn't allocate system stack - no free pages!\n");
+    exitsim ();
+  }
+  *((pcb->pagetable[L1_MAX_ENTRIES-1] & MEMORY_PTE_MASK) + L2_MAX_ENTRIES-1) = MemorySetupPte (newPage);
+
   pcb->sysStackArea = newPage * MEMORY_PAGE_SIZE;
 
   //----------------------------------------------------------------------
@@ -450,7 +492,7 @@ ProcessFork (VoidFunc func, uint32 param, char *name, int isUser)
 
   // Set the size (maximum number of entries) of the level 1 page table.
   // In our case, it's just one page, but it could be larger.
-  stackframe[PROCESS_STACK_PTSIZE] = pcb->npages;
+  stackframe[PROCESS_STACK_PTSIZE] = L1_MAX_ENTRIES;
 
   // Set the number of bits for both the level 1 and level 2 page tables.
   // This can be changed on a per-process basis if desired.  For now,
