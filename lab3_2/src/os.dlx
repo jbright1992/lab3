@@ -1,7 +1,7 @@
 ; Linked by DLX-LD.
 ; MemSize 94208
 ; Data size: 36644
-; Text size: 42252
+; Text size: 42228
 ; Stack size: 8192
 .text 0x1000
 .data 0xc000
@@ -3005,9 +3005,7 @@ L140_LF3:
 	lw	r1,96(r1)
 	addi	r6,r0,#-8
 	and	r2,r1,r6
-	slli	r1,r3,#0x2
-	add	r1,r1,r2
-	lw	r1,(r1)
+	add	r1,r2,r3
 	add	r1,r2,r1
 	add	r1,r1,r4
 L142_LF3:
@@ -3122,9 +3120,7 @@ L189_LF3:
 	lw	r1,96(r1)
 	addi	r11,r0,#-8
 	and	r2,r1,r11
-	slli	r1,r31,#0x2
-	add	r1,r1,r2
-	lw	r1,(r1)
+	add	r1,r2,r31
 	add	r1,r2,r1
 	add	r31,r1,r5
 L188_LF3:
@@ -3223,9 +3219,7 @@ L215_LF3:
 	lw	r1,96(r1)
 	addi	r11,r0,#-8
 	and	r2,r1,r11
-	slli	r1,r31,#0x2
-	add	r1,r1,r2
-	lw	r1,(r1)
+	add	r1,r2,r31
 	add	r1,r2,r1
 	add	r31,r1,r5
 L214_LF3:

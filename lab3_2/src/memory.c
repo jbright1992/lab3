@@ -173,7 +173,7 @@ MemoryTranslateUserToSystem (PCB *pcb, uint32 addr)
     if (pageOne >= L1_MAX_ENTRIES || pageTwo >= L2_MAX_ENTRIES) {
       return (0);
     }
-    return ((pcb->pagetable[pageOne] & MEMORY_PTE_MASK) + *(((uint32 *)(pcb->pagetable[pageOne] & MEMORY_PTE_MASK) + pageTwo)) + offset);
+    return ((pcb->pagetable[pageOne] & MEMORY_PTE_MASK) + (((pcb->pagetable[pageOne] & MEMORY_PTE_MASK) + pageTwo)) + offset);
 }
 int exponent(int value, int ex)
 {

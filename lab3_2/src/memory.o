@@ -1173,9 +1173,7 @@ L140:
 	lw	r1,96(r1)
 	addi	r6,r0,#-8
 	and	r2,r1,r6
-	slli	r1,r3,#0x2
-	add	r1,r1,r2
-	lw	r1,(r1)
+	add	r1,r2,r3
 	add	r1,r2,r1
 	add	r1,r1,r4
 L142:
@@ -1290,9 +1288,7 @@ L189:
 	lw	r1,96(r1)
 	addi	r11,r0,#-8
 	and	r2,r1,r11
-	slli	r1,r31,#0x2
-	add	r1,r1,r2
-	lw	r1,(r1)
+	add	r1,r2,r31
 	add	r1,r2,r1
 	add	r31,r1,r5
 L188:
@@ -1391,9 +1387,7 @@ L215:
 	lw	r1,96(r1)
 	addi	r11,r0,#-8
 	and	r2,r1,r11
-	slli	r1,r31,#0x2
-	add	r1,r1,r2
-	lw	r1,(r1)
+	add	r1,r2,r31
 	add	r1,r2,r1
 	add	r31,r1,r5
 L214:
