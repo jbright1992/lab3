@@ -167,12 +167,26 @@ MemoryTranslateUserToSystem (PCB *pcb, uint32 addr)
 // You need to change the code below 
 //-------------------------------------------
 
-    int	page = addr / MEMORY_PAGE_SIZE;
+    int	pageOne = addr / (MEMORY_PAGE_SIZE + (1 << 6));
+    int pageTwo = (addr / (MEMORY_PAGE_SIZE)) % (1 << 6);
     int offset = addr % MEMORY_PAGE_SIZE;
-    if (page > pcb->npages) {
+    if (pageOne >= L1_MAX_ENTRIES || pageTwo >= L2_MAX_ENTRIES) {
       return (0);
     }
-    return ((pcb->pagetable[page] & MEMORY_PTE_MASK) + offset);
+    return ((pcb->pagetable[pageOne] & MEMORY_PTE_MASK) + *(((uint32 *)(pcb->pagetable[pageOne] & MEMORY_PTE_MASK) + pageTwo)) + offset);
+}
+int exponent(int value, int ex)
+{
+    int i;
+    int result = 1;
+    if (ex == 0)
+        return 0;
+    for(i = 0; i < ex; i++)
+    {
+        result *= value;
+    }
+
+    return result;
 }
 
 //----------------------------------------------------------------------

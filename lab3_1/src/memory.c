@@ -152,8 +152,7 @@ MemoryFreePage(uint32 page)
 
 //----------------------------------------------------------------------
 //
-// MemoryTranslateUserToSystem
-//
+// MemoryTranslateUserToSystem //
 //	Translate a user address (in the process referenced by pcb)
 //	into an OS (physical) address.  This works for simple one-level
 //	page tables, but will have to be modified for two-level page
@@ -171,7 +170,7 @@ MemoryTranslateUserToSystem (PCB *pcb, uint32 addr)
 
     int	page = addr / MEMORY_PAGE_SIZE;
     int offset = addr % MEMORY_PAGE_SIZE;
-    if (page > L1_MAX_ENTRIES) {
+    if (page >= L1_MAX_ENTRIES) {
       return (0);
     }
     return ((pcb->pagetable[page] & MEMORY_PTE_MASK) + offset);
